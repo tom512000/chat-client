@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <map>
+#include <QDockWidget>
+#include <QInputDialog>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Chat ////////////////////////////////////////////////////////////////////////
@@ -50,7 +52,7 @@ Chat::Chat (const QString & host, quint16 port, QObject * parent) :
       if(i != PROCESSORS.end()) {
           (this->*(i->second))(stream);
       } else {
-          emit message(command);
+          emit message(m);
       }
     }
   });
@@ -112,7 +114,10 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
 
   // Insertion de la zone de saisie.
   // QDockWidget insérable en haut ou en bas, inséré en bas.
-  // TODO
+  QDockWidget *dockWidget = new QDockWidget(tr("Message Input"), this);
+  dockWidget->setAllowedAreas(Qt::BottomDockWidgetArea);
+  dockWidget->setWidget(&input);
+  addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
   // Désactivation de la zone de saisie.
   input.setEnabled (false);
@@ -120,19 +125,30 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   // Envoi de messages lorsque la touche "entrée" est pressée.
   // - transmission du texte au moteur de messagerie instantanée ;
   // - effacement de la zone de saisie.
-  // TODO
+  connect(&input, &QLineEdit::returnPressed, [this]() {
+      chat.write(input.text());
+      input.clear();
+  });
 
   // Connexion.
   // - affichage d'un message confirmant la connexion ;
   // - saisie de l'alias ;
   // - envoi de l'alias ;
   // - activation de la zone de saisie.
-  // TODO
+  connect(&chat, &Chat::connected, [this, host]() {
+      text.append("Vous êtes connecté !");
+      QString alias = QInputDialog::getText(this, tr("Entrez votre pseudonyme : "), tr("Pseudonyme : "));
+      chat.write(alias);
+      input.setEnabled(true);
+  });
 
   // Déconnexion.
   // - désactivation de la zone de saisie.
   // - affichage d'un message pour signaler la déconnexion.
-  // TODO
+  connect(&chat, &Chat::disconnected, [this]() {
+      input.setEnabled(false);
+      text.append(tr("Vous êtes déconnecté !"));
+  });
 
   // Messages.
   connect (&chat, &Chat::message, [this] (const QString & message) {
