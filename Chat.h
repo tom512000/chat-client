@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QTextEdit>
 #include <QLineEdit>
+#include <QTcpSocket>
 
 // Chat hérite de QObject
 class Chat : public QObject

@@ -18,10 +18,14 @@ Chat::Chat (const QString & host, quint16 port, QObject * parent) :
   socket ()
 {
   // Signal "connected" émis lorsque la connexion est effectuée.
-  // TODO
+  connect(&socket, &QTcpSocket::connected, [this, host, port]() {
+      emit connected(host, port);
+  });
 
   // Signal "disconnected" émis lors d'une déconnexion du socket.
-  // TODO
+  connect(&socket, &QTcpSocket::disconnected, [this]() {
+      emit disconnected();
+  });
 
   // Lecture.
   connect (&socket, &QIODevice::readyRead, [this] () {
