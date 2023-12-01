@@ -2,6 +2,7 @@
 #include "Chat.h"
 
 #include <iostream>
+#include <map>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Chat ////////////////////////////////////////////////////////////////////////
@@ -44,7 +45,13 @@ Chat::Chat (const QString & host, quint16 port, QObject * parent) :
       // Recherche de la commande serveur dans le tableau associatif.
       // - si elle existe, traitement du reste du message par le processeur ;
       // - sinon, émission du signal "message" contenant la ligne entière.
-      // TODO
+
+      auto i = PROCESSORS.find(command);
+      if(i != PROCESSORS.end()) {
+          (this->*(i->second))(stream);
+      } else {
+          emit message(command);
+      }
     }
   });
 
