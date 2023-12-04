@@ -148,7 +148,8 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   QMainWindow (parent),
   chat (host, port, this),
   text (this),
-  input (this)
+  input (this),
+  userListWidget(this)
 {
   text.setReadOnly (true);
   setCentralWidget (&text);
@@ -160,9 +161,13 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   dockWidget->setWidget(&input);
   addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
-
   // Désactivation de la zone de saisie.
   input.setEnabled (false);
+
+  // Liste des utilisateurs connectés
+  userListWidget.setWindowTitle(tr("Connected Users"));
+  userListWidget.setGeometry(400, 0, 200, 400);
+  userListWidget.show();
 
   // Envoi de messages lorsque la touche "entrée" est pressée.
   // - transmission du texte au moteur de messagerie instantanée ;
@@ -171,6 +176,15 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
       chat.write(input.text());
       input.clear();
   });
+
+  // Connexion pour mettre à jour la liste des utilisateurs.
+  connect(&chat, &Chat::user_list, [this](const QStringList &userList) {
+      userListWidget.clear();
+      userListWidget.addItems(userList);
+  });
+
+  // Connexion pour gérer le double-clic sur la liste des utilisateurs.
+      connect(&userListWidget, &QListWidget::itemDoubleClicked, this, &ChatWindow::onUserListDoubleClicked);
 
   // Connexion.
   // - affichage d'un message confirmant la connexion ;
@@ -231,4 +245,14 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
 
   // CONNEXION !
   text.append (tr("<b>Connecting...</b>"));
+}
+
+// Slot pour gérer le double-clic sur la liste des utilisateurs.
+void ChatWindow::onUserListDoubleClicked(QListWidgetItem *item)
+{
+    QString selectedUser = item->text();
+    // Ouvre une boîte de dialogue privée avec le nom de l'utilisateur sélectionné.
+    QString privateMessage = QInputDialog::getText(this, tr("Message privé à %1").arg(selectedUser),
+                                                   tr("Entrez votre message ici : "));
+    chat.write("/private " + selectedUser + " " + privateMessage);
 }
