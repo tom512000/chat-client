@@ -12,7 +12,13 @@
 
 // Processeurs.
 const std::map<QString, Chat::Processor> Chat::PROCESSORS {
-  {"#error", &Chat::process_error}
+  {"#error", &Chat::process_error},
+  {"#alias", &Chat::process_alias},
+  {"#connected", &Chat::process_user_connected},
+  {"#disconnected", &Chat::process_user_disconnected},
+  {"#renamed", &Chat::process_user_renamed},
+  {"#list", &Chat::process_user_list},
+  {"#private", &Chat::process_user_private}
 };
 
 // Constructeur.
@@ -36,7 +42,7 @@ Chat::Chat (const QString & host, quint16 port, QObject * parent) :
     while (socket.canReadLine ())
     {
       // Lecture d'une ligne et suppression du "newline".
-      QString m = socket.readLine ().chopped (1);
+      QString m = socket.readLine().chopped(1);
 
       // Flot de lecture.
       QTextStream stream (&m);
@@ -68,22 +74,57 @@ Chat::~Chat ()
 }
 
 // Commande "#alias"
-// TODO
+void Chat::process_alias(QTextStream &is)
+{
+    QString newAlias;
+    is >> newAlias;
+    emit alias(newAlias);
+}
 
 // Commande "#connected"
-// TODO
+void Chat::process_user_connected(QTextStream &is)
+{
+    QString username;
+    is >> username;
+    emit user_connected(username);
+}
 
 // Commande "#disconnected"
-// TODO
+void Chat::process_user_disconnected(QTextStream &is)
+{
+    QString username;
+    is >> username;
+    emit user_disconnected(username);
+}
 
 // Commande "#renamed"
-// TODO
+void Chat::process_user_renamed(QTextStream &is)
+{
+    QString oldUsername, newUsername;
+    is >> oldUsername >> newUsername;
+    emit user_renamed(oldUsername, newUsername);
+}
 
 // Commande "#list"
-// TODO
+void Chat::process_user_list(QTextStream &is)
+{
+    QStringList userList;
+     while (!is.atEnd()) {
+         QString user;
+         is >> user;
+         userList.append(user);
+     }
+     emit user_list(userList);
+}
 
 // Commande "#private"
-// TODO
+void Chat::process_user_private(QTextStream &is)
+{
+    QString sender, message;
+        is >> sender >> ws;
+        message = is.readLine();
+        emit user_private(sender, message);
+}
 
 // Commande "#error"
 void Chat::process_error (QTextStream & is)
@@ -118,6 +159,7 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   dockWidget->setAllowedAreas(Qt::BottomDockWidgetArea);
   dockWidget->setWidget(&input);
   addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+
 
   // Désactivation de la zone de saisie.
   input.setEnabled (false);
@@ -156,11 +198,31 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   });
 
   // Liste des utilisateurs.
-  // Connexion d'un utilisateur.
-  // Déconnexion d'un utilisateur.
-  // Nouvel alias d'un utilisateur.
+  connect(&chat, &Chat::user_list, [this](const QStringList &userList) {
+      QString userListStr = tr("<i>Utilisateurs connectés : </i> ") + userList.join(", ");
+      text.append(userListStr);
+  });
+
   // Message privé.
-  // TODO
+  connect(&chat, &Chat::user_private, [this](const QString &sender, const QString &message) {
+      QString privateMessage = tr("<i>Message privé de %1 : </i> %2").arg(sender, message);
+      text.append(privateMessage);
+  });
+
+  // Nouvel alias d'un utilisateur.
+  connect(&chat, &Chat::alias, [this](const QString &newAlias) {
+      text.append(tr("<i>Nouveau pseudo : </i> ") + newAlias);
+  });
+
+  // Connexion d'un utilisateur.
+  connect(&chat, &Chat::user_connected, [this](const QString &username) {
+      text.append(tr("<i>Utilisateur connecté : </i> ") + username);
+  });
+
+  // Déconnexion d'un utilisateur.
+  connect(&chat, &Chat::user_disconnected, [this](const QString &username) {
+      text.append(tr("<i>Utilisateur déconnecté :</i> ") + username);
+  });
 
   // Gestion des erreurs.
   connect (&chat, &Chat::error, [this] (const QString & id) {
@@ -170,4 +232,3 @@ ChatWindow::ChatWindow (const QString & host, quint16 port, QWidget * parent) :
   // CONNEXION !
   text.append (tr("<b>Connecting...</b>"));
 }
-

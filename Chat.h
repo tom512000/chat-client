@@ -26,6 +26,18 @@ class Chat : public QObject
     void process (const QString & message);
     // Gestion des erreurs.
     void process_error (QTextStream &);
+    // Gestion de l'alias
+    void process_alias(QTextStream &is);
+    // Gestion de l'utilisateur connecté
+    void process_user_connected(QTextStream &is);
+    // Gestion de l'utilisateur déconnecté
+    void process_user_disconnected(QTextStream &is);
+    // Gestion du renommage de l'utilisateur
+    void process_user_renamed(QTextStream &is);
+    // Gestion de l'affichage des utilisateurs
+    void process_user_list(QTextStream &is);
+    // Gestion des messages privés
+    void process_user_private(QTextStream &is);
 
   public:
     // constructeur : nom du serveur, port et, éventuellement, objet parent.
@@ -36,13 +48,26 @@ class Chat : public QObject
     void write (const QString &);
 
   signals:
-    // Connexion / déconnexion.
+    // Connexion
     void connected (const QString & host, quint16 port);
+    // Déconnexion
     void disconnected ();
     // Message.
     void message (const QString & message);
-    // Error.
+    // Error
     void error (const QString & id);
+    // Alias
+    void alias(const QString &newAlias);
+    // Utilisateur connecté
+    void user_connected(const QString &username);
+    // Utilisateur déconnecté
+    void user_disconnected(const QString &username);
+    // Utilisateur renommé
+    void user_renamed(const QString &oldUsername, const QString &newUsername);
+    // Liste des utilisateurs
+    void user_list(const QStringList &userList);
+    // Envoie d'un message privé
+    void user_private(const QString &sender, const QString &message);
 };
 
 // ChatWindow hérite de QMainWindow.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2023-12-01T10:19:36. -->
+<!-- Written by QtCreator 4.11.0, 2023-12-01T12:05:50. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -265,7 +265,7 @@
     <value type="int" key="Analyzer.Perf.StackSize">4096</value>
     <value type="bool" key="Analyzer.QmlProfiler.AggregateTraces">false</value>
     <value type="bool" key="Analyzer.QmlProfiler.FlushEnabled">false</value>
-    <value type="uint" key="Analyzer.QmlProfiler.FlushInterval">0</value>
+    <value type="uint" key="Analyzer.QmlProfiler.FlushInterval">1000</value>
     <value type="QString" key="Analyzer.QmlProfiler.LastTraceFile"></value>
     <value type="bool" key="Analyzer.QmlProfiler.Settings.UseGlobalSettings">true</value>
     <valuelist type="QVariantList" key="Analyzer.Valgrind.AddedSuppressionFiles"/>
@@ -305,8 +305,9 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/Users/siko0001/chat-client/Chat.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/Users/siko0001/chat-client/Chat.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Chat2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/Users/siko0001/Chat-Client/chat-client/Chat.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/Users/siko0001/Chat-Client/chat-client/Chat.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
